@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Winnie Wayua Nduva — Payment Operations & Data Analyst</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#fafaf8;--surface:#fff;--border:#e8e6e0;
+  --text:#1a1a18;--muted:#6b6b64;
+  --accent:#1a5c3a;--accent-light:#e8f2ec;--accent-mid:#2d7a52;
+  --tag-bg:#f0f0ec;--tag-text:#4a4a44;
+  --nav-w:220px;
+}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);font-size:16px;line-height:1.7;display:flex;}
+
+/* SIDEBAR NAV */
+aside{
+  width:var(--nav-w);flex-shrink:0;
+  height:100vh;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  padding:2.5rem 1.75rem;
+  position:fixed;left:0;top:0;bottom:0;
+  z-index:10;
+}
+.nav-brand{margin-bottom:2.5rem;}
+.nav-brand-name{
+  font-family:'DM Serif Display',serif;
+  font-size:1.15rem;letter-spacing:-0.01em;
+  color:var(--text);line-height:1.2;
+  display:block;margin-bottom:3px;
+}
+.nav-brand-role{font-size:0.75rem;color:var(--muted);font-weight:400;letter-spacing:0.02em;}
+
+nav ul{list-style:none;display:flex;flex-direction:column;gap:2px;flex:1;}
+nav ul li a{
+  display:flex;align-items:center;gap:10px;
+  padding:0.55rem 0.75rem;
+  border-radius:8px;
+  font-size:0.88rem;font-weight:400;
+  color:var(--muted);text-decoration:none;
+  transition:all 0.15s;
+  cursor:pointer;
+}
+nav ul li a:hover{background:var(--accent-light);color:var(--accent);}
+nav ul li a.active{background:var(--accent-light);color:var(--accent);font-weight:500;}
+nav ul li a .nav-icon{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
+
+.nav-bottom{margin-top:auto;padding-top:1.5rem;border-top:1px solid var(--border);display:flex;flex-direction:column;gap:0.6rem;}
+.nav-social{display:flex;align-items:center;gap:8px;font-size:0.8rem;color:var(--muted);text-decoration:none;transition:color 0.15s;}
+.nav-social:hover{color:var(--accent);}
+.nav-social svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* MOBILE TOP BAR */
+.topbar{
+  display:none;
+  position:fixed;top:0;left:0;right:0;height:56px;z-index:20;
+  background:rgba(250,250,248,0.95);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--border);
+  align-items:center;justify-content:space-between;
+  padding:0 1.25rem;
+}
+.topbar-name{font-family:'DM Serif Display',serif;font-size:1rem;color:var(--text);}
+.burger{background:none;border:none;cursor:pointer;display:flex;flex-direction:column;gap:4px;padding:4px;}
+.burger span{width:20px;height:1.5px;background:var(--text);display:block;transition:all 0.2s;}
+
+/* MOBILE DRAWER */
+.drawer{
+  display:none;
+  position:fixed;top:56px;left:0;right:0;bottom:0;z-index:15;
+  background:var(--surface);padding:1.5rem;
+  overflow-y:auto;transform:translateX(-100%);transition:transform 0.25s ease;
+}
+.drawer.open{transform:translateX(0);}
+.drawer ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+.drawer ul li a{
+  display:flex;align-items:center;gap:10px;
+  padding:0.75rem 1rem;border-radius:8px;
+  font-size:1rem;color:var(--muted);text-decoration:none;
+}
+.drawer ul li a.active{background:var(--accent-light);color:var(--accent);font-weight:500;}
+
+/* MAIN CONTENT */
+main{
+  margin-left:var(--nav-w);
+  flex:1;height:100vh;overflow-y:auto;
+  scroll-behavior:smooth;
+}
+
+/* PAGES */
+.page{
+  display:none;
+  min-height:100vh;
+  animation:fadeIn 0.25s ease;
+}
+.page.active{display:block;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+
+.page-inner{
+  max-width:740px;
+  margin:0 auto;
+  padding:4rem 2.5rem 5rem;
+}
+
+/* PAGE HEADER */
+.page-eyebrow{font-size:0.72rem;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent-mid);margin-bottom:0.4rem;}
+h1{font-family:'DM Serif Display',serif;font-size:clamp(2rem,4vw,2.8rem);letter-spacing:-0.02em;line-height:1.1;color:var(--text);margin-bottom:1rem;}
+h1 em{font-style:italic;color:var(--accent);}
+h2{font-family:'DM Serif Display',serif;font-size:1.8rem;letter-spacing:-0.02em;line-height:1.15;color:var(--text);margin-bottom:2rem;}
+h3{font-size:1rem;font-weight:500;color:var(--text);margin-bottom:0.3rem;}
+
+/* HERO PAGE */
+.hero-layout{display:flex;align-items:center;gap:3rem;margin-bottom:2.5rem;}
+.hero-photo-wrap{
+  flex-shrink:0;width:130px;height:130px;border-radius:50%;
+  border:3px solid var(--accent-light);overflow:hidden;
+  cursor:pointer;background:var(--accent-light);
+  display:flex;align-items:center;justify-content:center;
+  transition:border-color 0.2s;position:relative;
+}
+.hero-photo-wrap:hover{border-color:var(--accent-mid);}
+.hero-photo-wrap img{width:100%;height:100%;object-fit:cover;display:none;}
+.photo-ph{display:flex;flex-direction:column;align-items:center;gap:4px;pointer-events:none;}
+.photo-ph svg{width:28px;height:28px;stroke:var(--accent-mid);fill:none;stroke-width:1.5;}
+.photo-ph span{font-size:9px;color:var(--accent-mid);font-weight:500;letter-spacing:0.06em;text-transform:uppercase;}
+#photo-upload{display:none;}
+
+.hero-meta{}
+.hero-eyebrow{font-size:0.75rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-mid);margin-bottom:0.5rem;}
+.hero-subtitle{font-family:'DM Serif Display',serif;font-size:1rem;font-style:italic;color:var(--muted);margin-bottom:0.9rem;}
+.hero-bio{font-size:0.96rem;color:var(--muted);line-height:1.65;max-width:460px;margin-bottom:1.75rem;}
+.hero-actions{display:flex;gap:0.75rem;flex-wrap:wrap;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:0.55rem 1.25rem;border-radius:100px;font-size:0.85rem;font-weight:500;text-decoration:none;cursor:pointer;transition:all 0.2s;border:none;font-family:'DM Sans',sans-serif;}
+.btn-primary{background:var(--accent);color:#fff;}
+.btn-primary:hover{background:var(--accent-mid);}
+.btn-outline{background:transparent;color:var(--text);border:1.5px solid var(--border);}
+.btn-outline:hover{border-color:var(--text);}
+.btn svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:2;}
+
+/* STAT CARDS */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:1rem;margin-top:2.5rem;}
+.stat-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.1rem 1rem;}
+.stat-num{font-family:'DM Serif Display',serif;font-size:1.7rem;color:var(--accent);line-height:1;margin-bottom:0.2rem;}
+.stat-label{font-size:0.75rem;color:var(--muted);}
+
+/* ABOUT */
+.about-body p{color:var(--muted);font-size:0.96rem;margin-bottom:1rem;max-width:600px;}
+
+/* SKILLS */
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1.1rem;}
+.skill-group{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:1.25rem;}
+.skill-group-title{font-size:0.72rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:var(--accent-mid);margin-bottom:0.8rem;}
+.skill-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.tag{background:var(--tag-bg);color:var(--tag-text);border-radius:6px;padding:3px 9px;font-size:0.79rem;}
+
+/* PROJECTS */
+.projects-list{display:flex;flex-direction:column;gap:1.1rem;}
+.project-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:1.5rem 1.75rem;display:grid;grid-template-columns:1fr auto;gap:1rem;align-items:start;text-decoration:none;color:inherit;transition:border-color 0.2s,box-shadow 0.2s;}
+.project-card:hover{border-color:var(--accent-mid);box-shadow:0 4px 16px rgba(26,92,58,0.07);}
+.project-name{font-size:1rem;font-weight:500;margin-bottom:0.3rem;}
+.project-desc{font-size:0.87rem;color:var(--muted);line-height:1.6;margin-bottom:0.85rem;}
+.project-tags{display:flex;flex-wrap:wrap;gap:5px;}
+.proj-arrow{color:var(--muted);transition:color 0.2s;}
+.project-card:hover .proj-arrow{color:var(--accent);}
+.proj-arrow svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;}
+
+/* TIMELINE */
+.timeline{display:flex;flex-direction:column;}
+.tl-item{display:grid;grid-template-columns:120px 1fr;gap:0 2rem;padding-bottom:2.25rem;position:relative;}
+.tl-item:not(:last-child)::after{content:'';position:absolute;left:138px;top:8px;bottom:0;width:1px;background:var(--border);}
+.tl-date{font-size:0.78rem;color:var(--muted);text-align:right;padding-top:2px;line-height:1.4;}
+.tl-dot{width:8px;height:8px;border-radius:50%;background:var(--accent);position:absolute;left:134px;top:5px;}
+.tl-role{font-size:0.96rem;font-weight:500;margin-bottom:1px;}
+.tl-org{font-size:0.83rem;color:var(--accent-mid);margin-bottom:0.4rem;}
+.tl-bullets{list-style:none;padding:0;}
+.tl-bullets li{font-size:0.86rem;color:var(--muted);line-height:1.6;padding-left:1rem;position:relative;margin-bottom:3px;}
+.tl-bullets li::before{content:'–';position:absolute;left:0;color:var(--accent-mid);}
+
+/* SECTION DIVIDER */
+.section-divider{font-size:0.72rem;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--accent-mid);margin:2.5rem 0 1.5rem;padding-bottom:0.5rem;border-bottom:1px solid var(--border);}
+
+/* CERTS */
+.certs-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(195px,1fr));gap:0.9rem;}
+.cert-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:0.9rem 1rem;display:flex;align-items:flex-start;gap:10px;}
+.cert-icon{flex-shrink:0;width:30px;height:30px;border-radius:7px;background:var(--accent-light);display:flex;align-items:center;justify-content:center;}
+.cert-icon svg{width:14px;height:14px;stroke:var(--accent-mid);fill:none;stroke-width:2;}
+.cert-name{font-size:0.83rem;font-weight:500;line-height:1.3;}
+.cert-issuer{font-size:0.75rem;color:var(--muted);margin-top:1px;}
+
+/* CONTACT */
+.contact-layout{display:grid;grid-template-columns:1fr 1fr;gap:3.5rem;align-items:start;}
+.contact-intro p{font-size:0.95rem;color:var(--muted);margin-bottom:1.5rem;}
+.contact-links{display:flex;flex-direction:column;gap:0.75rem;}
+.contact-link{display:flex;align-items:center;gap:10px;font-size:0.87rem;color:var(--muted);text-decoration:none;transition:color 0.15s;}
+.contact-link:hover{color:var(--text);}
+.contact-link svg{width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:1.8;flex-shrink:0;}
+.contact-form{display:flex;flex-direction:column;gap:0.9rem;}
+.contact-form label{font-size:0.75rem;font-weight:500;color:var(--text);letter-spacing:0.05em;text-transform:uppercase;display:block;margin-bottom:3px;}
+.contact-form input,.contact-form textarea{width:100%;padding:0.6rem 0.8rem;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--text);transition:border-color 0.2s;outline:none;resize:vertical;}
+.contact-form input:focus,.contact-form textarea:focus{border-color:var(--accent-mid);}
+.contact-form textarea{min-height:100px;}
+
+/* RESPONSIVE */
+@media(max-width:700px){
+  aside{display:none;}
+  .topbar{display:flex;}
+  .drawer{display:block;}
+  main{margin-left:0;padding-top:56px;}
+  .page-inner{padding:2.5rem 1.25rem 4rem;}
+  .hero-layout{flex-direction:column;gap:1.5rem;align-items:flex-start;}
+  .stats-row{grid-template-columns:1fr 1fr;}
+  .contact-layout{grid-template-columns:1fr;gap:2rem;}
+  .tl-item{grid-template-columns:1fr;}
+  .tl-item::after,.tl-dot{display:none;}
+  .tl-date{text-align:left;}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside>
+  <div class="nav-brand">
+    <span class="nav-brand-name">Winnie Nduva</span>
+    <span class="nav-brand-role">Data & Payments Analyst</span>
+  </div>
+  <nav>
+    <ul>
+      <li><a href="#" class="active" data-page="home">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9,22 9,12 15,12 15,22"/></svg>
+        Home
+      </a></li>
+      <li><a href="#" data-page="about">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        About
+      </a></li>
+      <li><a href="#" data-page="skills">
+        <svg class="nav-icon" viewBox="0 0 24 24"><polyline points="22,12 18,12 15,21 9,3 6,12 2,12"/></svg>
+        Skills
+      </a></li>
+      <li><a href="#" data-page="projects">
+        <svg class="nav-icon" viewBox="0 0 24 24"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+        Projects
+      </a></li>
+      <li><a href="#" data-page="experience">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/></svg>
+        Experience
+      </a></li>
+      <li><a href="#" data-page="contact">
+        <svg class="nav-icon" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+        Contact
+      </a></li>
+    </ul>
+  </nav>
+  <div class="nav-bottom">
+    <a class="nav-social" href="https://github.com/nduvawinnie" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+      GitHub
+    </a>
+    <a class="nav-social" href="https://www.linkedin.com/in/winnie-wayua-2b23021b5/" target="_blank" rel="noopener">
+      <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      LinkedIn
+    </a>
+  </div>
+</aside>
+
+<!-- MOBILE TOPBAR -->
+<div class="topbar">
+  <span class="topbar-name">Winnie Nduva</span>
+  <button class="burger" id="burger" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</div>
+
+<!-- MOBILE DRAWER -->
+<div class="drawer" id="drawer">
+  <ul>
+    <li><a href="#" class="active" data-page="home">Home</a></li>
+    <li><a href="#" data-page="about">About</a></li>
+    <li><a href="#" data-page="skills">Skills</a></li>
+    <li><a href="#" data-page="projects">Projects</a></li>
+    <li><a href="#" data-page="experience">Experience</a></li>
+    <li><a href="#" data-page="contact">Contact</a></li>
+  </ul>
+</div>
+
+<!-- MAIN -->
+<main id="main">
+
+  <!-- HOME -->
+  <div class="page active" id="page-home">
+    <div class="page-inner">
+      <input type="file" id="photo-upload" accept="image/*"/>
+      <div class="hero-layout">
+        <div class="hero-photo-wrap" id="photo-wrap" onclick="document.getElementById('photo-upload').click()" title="Click to upload photo">
+          <img id="hero-img" src="" alt="Winnie Nduva"/>
+          <div class="photo-ph" id="photo-ph">
+            <svg viewBox="0 0 24 24"><path d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            <span>Add Photo</span>
+          </div>
+        </div>
+        <div>
+          <p class="hero-eyebrow">Payment Operations · Data Analytics · Fintech</p>
+          <h1>Winnie <em>Wayua</em> Nduva</h1>
+          <p class="hero-subtitle">Team Lead · Sportserve, Nairobi</p>
+          <p class="hero-bio">Fintech-focused analyst with 3+ years optimising payment flows, managing settlements and chargebacks, and turning complex transaction data into clear decisions for C-suite stakeholders.</p>
+          <div class="hero-actions">
+            <a href="#" class="btn btn-primary" data-page="projects">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+              View Projects
+            </a>
+            <a href="#" class="btn btn-outline" data-page="contact">Get in touch</a>
+          </div>
+        </div>
+      </div>
+      <div class="stats-row">
+        <div class="stat-card"><div class="stat-num">3+</div><div class="stat-label">Years in fintech</div></div>
+        <div class="stat-card"><div class="stat-num">35%</div><div class="stat-label">Transaction success uplift</div></div>
+        <div class="stat-card"><div class="stat-num">C-suite</div><div class="stat-label">Weekly reporting</div></div>
+        <div class="stat-card"><div class="stat-num">Multi</div><div class="stat-label">Market operations</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <div class="page" id="page-about">
+    <div class="page-inner">
+      <p class="page-eyebrow">About me</p>
+      <h2>Payments analyst,<br><em style="font-family:'DM Serif Display',serif;font-style:italic;color:var(--accent);">data storyteller</em></h2>
+      <div class="about-body">
+        <p>I'm a Payment Operations and Data Analyst based in Nairobi, Kenya, specialising in fintech and iGaming. As a Team Lead at Sportserve, I oversee payment method allocation across multiple markets and present weekly insights directly to C-level executives.</p>
+        <p>My background bridges finance and data — a BCom in Finance from the Catholic University of Eastern Africa, combined with hands-on expertise in SQL, Python, Power BI, Tableau, Looker Studio, and Grafana. I'm currently deepening my Data Science and AI skills at Moringa School.</p>
+        <p>I care about making financial systems more efficient, transparent, and accessible — and I enjoy mentoring junior analysts to grow in the same direction.</p>
+        <p>Outside work, I'm interested in capital markets, having competed in the FINTOK Competition by the Capital Market Authority, and I hold CIFA certification (Intermediate Level 2) through KASNEB.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="page" id="page-skills">
+    <div class="page-inner">
+      <p class="page-eyebrow">Technical skills</p>
+      <h2>What I work with</h2>
+      <div class="skills-grid">
+        <div class="skill-group">
+          <div class="skill-group-title">Languages & Query</div>
+          <div class="skill-tags"><span class="tag">SQL</span><span class="tag">Python</span><span class="tag">Excel</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">BI & Dashboards</div>
+          <div class="skill-tags"><span class="tag">Power BI</span><span class="tag">Tableau</span><span class="tag">Looker Studio</span><span class="tag">Grafana</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Payment Operations</div>
+          <div class="skill-tags"><span class="tag">Settlements</span><span class="tag">Payouts</span><span class="tag">Chargebacks</span><span class="tag">Reconciliation</span><span class="tag">Risk Mitigation</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Finance & Analysis</div>
+          <div class="skill-tags"><span class="tag">Financial Forecasting</span><span class="tag">KPI Tracking</span><span class="tag">Treasury Ops</span><span class="tag">Multi-Currency</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Tools & Workflow</div>
+          <div class="skill-tags"><span class="tag">Jupyter Notebook</span><span class="tag">Git / GitHub</span><span class="tag">Process Automation</span></div>
+        </div>
+        <div class="skill-group">
+          <div class="skill-group-title">Soft Skills</div>
+          <div class="skill-tags"><span class="tag">Team Leadership</span><span class="tag">Stakeholder Comms</span><span class="tag">Cross-functional</span><span class="tag">Mentoring</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PROJECTS -->
+  <div class="page" id="page-projects">
+    <div class="page-inner">
+      <p class="page-eyebrow">GitHub projects</p>
+      <h2>Selected work</h2>
+      <div class="projects-list">
+        <a class="project-card" href="https://github.com/nduvawinnie/global-health-analysis" target="_blank" rel="noopener">
+          <div>
+            <div class="project-name">global-health-analysis</div>
+            <div class="project-desc">Exploring global health trends across countries and time periods using Excel. Identifies patterns in health outcomes, disease prevalence, and regional disparities.</div>
+            <div class="project-tags"><span class="tag">Excel</span><span class="tag">Data Analysis</span><span class="tag">Health</span></div>
+          </div>
+          <div class="proj-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
+        </a>
+        <a class="project-card" href="https://github.com/nduvawinnie/amazon-sales-analysis" target="_blank" rel="noopener">
+          <div>
+            <div class="project-name">amazon-sales-analysis</div>
+            <div class="project-desc">Analysing Amazon sales trends, top products, and revenue patterns using Python and Excel. Uncovers insights into category performance and seasonal demand shifts.</div>
+            <div class="project-tags"><span class="tag">Python</span><span class="tag">Excel</span><span class="tag">Sales Analytics</span></div>
+          </div>
+          <div class="proj-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
+        </a>
+        <a class="project-card" href="https://github.com/nduvawinnie/aircraft-safety-analysis-review" target="_blank" rel="noopener">
+          <div>
+            <div class="project-name">aircraft-safety-analysis-review</div>
+            <div class="project-desc">Analysing aviation fatality data to identify lowest-risk aircraft for business investment. Built in Jupyter Notebook with statistical risk scoring across aircraft models.</div>
+            <div class="project-tags"><span class="tag">Jupyter Notebook</span><span class="tag">Python</span><span class="tag">Risk Analysis</span></div>
+          </div>
+          <div class="proj-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
+        </a>
+        <a class="project-card" href="https://github.com/nduvawinnie/ai-productivity-analysis" target="_blank" rel="noopener">
+          <div>
+            <div class="project-name">ai-productivity-analysis</div>
+            <div class="project-desc">Analysing the impact of AI tools on productivity using Python. Examines workflow efficiency, time savings, and adoption patterns across different use cases.</div>
+            <div class="project-tags"><span class="tag">Jupyter Notebook</span><span class="tag">Python</span><span class="tag">AI</span><span class="tag">Productivity</span></div>
+          </div>
+          <div class="proj-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
+        </a>
+        <a class="project-card" href="https://github.com/nduvawinnie/movie-performance-analysis" target="_blank" rel="noopener">
+          <div>
+            <div class="project-name">movie-performance-analysis</div>
+            <div class="project-desc">Exploring movie revenue, genre trends, and performance patterns using Python. Analyses box office data to surface insights on what drives film commercial success.</div>
+            <div class="project-tags"><span class="tag">Jupyter Notebook</span><span class="tag">Python</span><span class="tag">EDA</span></div>
+          </div>
+          <div class="proj-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
+        </a>
+        <a class="project-card" href="https://github.com/nduvawinnie/tanzanian-waterwell-prediction" target="_blank" rel="noopener">
+          <div>
+            <div class="project-name">tanzanian-waterwell-prediction</div>
+            <div class="project-desc">Predicting the condition of water wells in Tanzania using machine learning. Helps prioritise maintenance and repair efforts to improve water access across communities.</div>
+            <div class="project-tags"><span class="tag">Jupyter Notebook</span><span class="tag">Python</span><span class="tag">Machine Learning</span><span class="tag">Classification</span></div>
+          </div>
+          <div class="proj-arrow"><svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7,7 17,7 17,17"/></svg></div>
+        </a>
+      </div>
+      <p style="font-size:0.83rem;color:var(--muted);margin-top:1.25rem;">View all repos on <a href="https://github.com/nduvawinnie" target="_blank" rel="noopener" style="color:var(--accent-mid);text-decoration:none;">github.com/nduvawinnie</a></p>
+    </div>
+  </div>
+
+  <!-- EXPERIENCE -->
+  <div class="page" id="page-experience">
+    <div class="page-inner">
+      <p class="page-eyebrow">Experience & education</p>
+      <h2>Career timeline</h2>
+
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">Mar 2023 –<br>Present</div>
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-role">Payment Operations & Data Analyst — Team Lead</div>
+            <div class="tl-org">Sportserve · Nairobi, Kenya</div>
+            <ul class="tl-bullets">
+              <li>Led analysts optimising payment method allocation across multiple markets, improving transaction success rates by 35%.</li>
+              <li>Present weekly performance reports and data-driven insights directly to C-level stakeholders.</li>
+              <li>Oversee end-to-end merchant settlement processes including payouts, chargebacks, and dispute resolution.</li>
+              <li>Built interactive dashboards in Power BI, Looker Studio, and Grafana for real-time monitoring.</li>
+              <li>Champion process automation, reducing manual workload and improving customer experience.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Mar 2021 –<br>Present</div>
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-role">Freelance Data Analyst</div>
+            <div class="tl-org">Self-Employed · Remote</div>
+            <ul class="tl-bullets">
+              <li>Analysed large datasets using SQL, Python, and Excel for international clients across multiple industries.</li>
+              <li>Designed interactive dashboards in Power BI and Tableau to support executive decision-making.</li>
+              <li>Automated reporting processes and improved data pipelines for accuracy and efficiency.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">Feb – Apr 2022</div>
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-role">Executive Research Assistant Analyst — Intern</div>
+            <div class="tl-org">KCA University Foundation Division · Nairobi</div>
+            <ul class="tl-bullets">
+              <li>Analysed and summarised academic and institutional data for research projects.</li>
+              <li>Prepared reports and presentations to support departmental decision-making.</li>
+            </ul>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">May – Jul 2019</div>
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-role">Finance Intern Analyst</div>
+            <div class="tl-org">Kenya Power & Lighting Company · Nairobi</div>
+            <ul class="tl-bullets">
+              <li>Supported financial accounting, payroll processing, and payment reconciliation.</li>
+              <li>Handled bank, revenue, and stock reconciliations to ensure accuracy of financial records.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider">Education</div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-date">Oct 2025 –<br>Present</div>
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-role">Data Science and AI</div>
+            <div class="tl-org">Moringa School</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">May 2022 –<br>Present</div>
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-role">Certified Investment & Financial Analyst (CIFA)</div>
+            <div class="tl-org">KASNEB · Intermediate Level 2</div>
+          </div>
+        </div>
+        <div class="tl-item">
+          <div class="tl-date">2017 – 2021</div>
+          <div class="tl-dot"></div>
+          <div>
+            <div class="tl-role">BCom — Finance Option</div>
+            <div class="tl-org">The Catholic University of Eastern Africa · Second Class Honours, Upper Division</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-divider">Certifications</div>
+      <div class="certs-grid">
+        <div class="cert-card"><div class="cert-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/></svg></div><div><div class="cert-name">Google Data Analytics</div><div class="cert-issuer">Google / Coursera</div></div></div>
+        <div class="cert-card"><div class="cert-icon"><svg viewBox="0 0 24 24"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20z"/><path d="M12 6v6l4 2"/></svg></div><div><div class="cert-name">Generative AI for Data Analysis</div><div class="cert-issuer">LinkedIn Learning</div></div></div>
+        <div class="cert-card"><div class="cert-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8M12 17v4"/></svg></div><div><div class="cert-name">AI Essentials</div><div class="cert-issuer">ALX</div></div></div>
+        <div class="cert-card"><div class="cert-icon"><svg viewBox="0 0 24 24"><path d="M2 20h20M4 20V10l8-7 8 7v10"/></svg></div><div><div class="cert-name">McKinsey Forward Program</div><div class="cert-issuer">McKinsey & Company</div></div></div>
+        <div class="cert-card"><div class="cert-icon"><svg viewBox="0 0 24 24"><path d="M3 3h18v18H3zM3 9h18M9 21V9"/></svg></div><div><div class="cert-name">Investment Banking & Asset Management</div><div class="cert-issuer">Internship Experience UK</div></div></div>
+        <div class="cert-card"><div class="cert-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div><div><div class="cert-name">Data Protection Course</div><div class="cert-issuer">CIPIT / Strathmore University</div></div></div>
+      </div>
+
+      <div style="margin-top:2rem;">
+        <a href="mailto:nduvawinnie29@gmail.com?subject=CV%20Request" class="btn btn-outline">
+          <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7,10 12,15 17,10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Request full CV (PDF)
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="page" id="page-contact">
+    <div class="page-inner">
+      <p class="page-eyebrow">Get in touch</p>
+      <h2>Let's work together</h2>
+      <div class="contact-layout">
+        <div>
+          <div class="contact-intro">
+            <p>Open to new opportunities, freelance data projects, and collaborations in fintech, payment operations, and data analytics. Based in Nairobi — available globally.</p>
+          </div>
+          <div class="contact-links">
+            <a class="contact-link" href="mailto:nduvawinnie29@gmail.com">
+              <svg viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+              nduvawinnie29@gmail.com
+            </a>
+            <a class="contact-link" href="tel:+254790648142">
+              <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.21 12 19.79 19.79 0 0 1 1.14 3.4 2 2 0 0 1 3.12 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+              0790 648 142
+            </a>
+            <a class="contact-link" href="https://github.com/nduvawinnie" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M9 19c-4.3 1.4-4.3-2.5-6-3m12 5v-3.5c0-1 .1-1.4-.5-2 2.8-.3 5.5-1.4 5.5-6a4.6 4.6 0 0 0-1.3-3.2 4.2 4.2 0 0 0-.1-3.2s-1.1-.3-3.5 1.3a12.3 12.3 0 0 0-6.2 0C6.5 2.8 5.4 3.1 5.4 3.1a4.2 4.2 0 0 0-.1 3.2A4.6 4.6 0 0 0 4 9.5c0 4.6 2.7 5.7 5.5 6-.6.6-.6 1.2-.5 2V21"/></svg>
+              github.com/nduvawinnie
+            </a>
+            <a class="contact-link" href="https://www.linkedin.com/in/winnie-wayua-2b23021b5/" target="_blank" rel="noopener">
+              <svg viewBox="0 0 24 24"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+              linkedin.com/in/winnie-wayua
+            </a>
+          </div>
+        </div>
+        <div class="contact-form">
+          <div>
+            <label for="c-name">Name</label>
+            <input type="text" id="c-name" placeholder="Your name"/>
+          </div>
+          <div>
+            <label for="c-email">Email</label>
+            <input type="email" id="c-email" placeholder="your@email.com"/>
+          </div>
+          <div>
+            <label for="c-msg">Message</label>
+            <textarea id="c-msg" placeholder="Tell me about your project or opportunity…"></textarea>
+          </div>
+          <button class="btn btn-primary" onclick="handleContact(event)" style="align-self:flex-start;">Send message</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+function navigate(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('[data-page]').forEach(a => a.classList.remove('active'));
+  var page = document.getElementById('page-' + pageId);
+  if (page) {
+    page.classList.add('active');
+    document.getElementById('main').scrollTop = 0;
+  }
+  document.querySelectorAll('[data-page="' + pageId + '"]').forEach(a => a.classList.add('active'));
+  document.getElementById('drawer').classList.remove('open');
+}
+
+document.querySelectorAll('[data-page]').forEach(function(el) {
+  el.addEventListener('click', function(e) {
+    e.preventDefault();
+    navigate(this.getAttribute('data-page'));
+  });
+});
+
+document.getElementById('burger').addEventListener('click', function() {
+  document.getElementById('drawer').classList.toggle('open');
+});
+
+document.getElementById('photo-upload').addEventListener('change', function(e) {
+  var file = e.target.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function(ev) {
+    var img = document.getElementById('hero-img');
+    img.src = ev.target.result;
+    img.style.display = 'block';
+    document.getElementById('photo-ph').style.display = 'none';
+  };
+  reader.readAsDataURL(file);
+});
+
+function handleContact(e) {
+  var name = document.getElementById('c-name').value.trim();
+  var email = document.getElementById('c-email').value.trim();
+  var msg = document.getElementById('c-msg').value.trim();
+  if (!name || !email || !msg) { alert('Please fill in all fields.'); return; }
+  var btn = e.target;
+  btn.textContent = 'Sent ✓';
+  btn.style.background = '#2d7a52';
+  btn.disabled = true;
+  window.location.href = 'mailto:nduvawinnie29@gmail.com?subject=Portfolio%20Enquiry%20from%20' + encodeURIComponent(name) + '&body=' + encodeURIComponent(msg) + '%0A%0AFrom%3A%20' + encodeURIComponent(email);
+}
+</script>
+</body>
+</html>
